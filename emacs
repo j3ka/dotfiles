@@ -172,28 +172,53 @@ There are two things you can do about this warning:
 
 
 ;; PHP
-(require 'php-doc-block)
+;; company
+;; company-phpactor
+;; flycheck
+;; flycheck-inline
+;; phpactor
+;; smart-jump
+;; yafolding
 (add-hook 'php-mode-hook
-          '(lambda ()
-             (local-set-key (kbd "<C-tab>") 'php-doc-block)
-             ;; (ede-php-autoload-mode)
-             ;;(setq geben-path-mappings '(("/home/jeka/Code/php/phpic/web-app" "/container-app")))
-             (company-mode t)
-             (company-phpactor t)
-             (require 'company-php)
-             (ac-php-core-eldoc-setup)
-             (set (make-local-variable 'company-backends)
-                  '((company-ac-php-backend company-dabbrev-code)
-                    company-capf company-files))
-             (evil-define-key 'insert 'global (kbd "C-]") 'ac-php-find-symbol-at-point)
-             (evil-define-key 'insert 'global (kbd "C-[") 'ac-php-location-stack-back)
+          (lambda ()
+            (set (make-local-variable 'company-backends)
+                 '(company-phpactor
+                   company-files))
+            (make-local-variable 'eldoc-documentation-function)
+            (setq eldoc-documentation-function
+                  'phpactor-hover)))
+(with-eval-after-load 'php-mode
+  (phpactor-smart-jump-register))
+;; (define-transient-command php-transient-menu ()
+;;   "Php"
+;;   [["Class"
+;;     ("cc" "Copy" phpactor-copy-class)
+;;     ("cn" "New" phpactor-create-new-class)
+;;     ("cr" "Move" phpactor-move-class)
+;;     ("ci" "Inflect" phpactor-inflect-class)
+;;     ("n"  "Namespace" phpactor-fix-namespace)]
+;;    ["Properties"
+;;     ("a"  "Accessor" phpactor-generate-accessors)
+;;     ("pc" "Constructor" phpactor-complete-constructor)
+;;     ("pm" "Add missing props" phpactor-complete-properties)
+;;     ("r" "Rename var locally" phpactor-rename-variable-local)
+;;     ("R" "Rename var in file" phpactor-rename-variable-file)]
+;;   ["Extract"
+;;     ("ec" "constant" phpactor-extract-constant)
+;;     ("ee" "expression" phpactor-extract-expression)
+;;     ("em"  "method" phpactor-extract-method)]
+;;   ["Methods"
+;;     ("i" "Implement Contracts" phpactor-implement-contracts)
+;;     ("m"  "Generate method" phpactor-generate-method)]
+;;   ["Navigate"
+;;     ("x" "List refs" phpactor-list-references)
+;;     ("X" "Replace refs" phpactor-replace-references)
+;;     ("."  "Goto def" phpactor-goto-definition)]
+;;   ["Phpactor"
+;;     ("s" "Status" phpactor-status)
+;;     ("u" "Install" phpactor-install-or-update)]])
 
-             (make-local-variable 'eldoc-documentation-function)
-             (setq eldoc-documentation-function 'phpactor-hover)
-             (add-to-list 'company-backends 'company-ac-php-backend)))
-;;(add-hook 'php-mode-hook #'ede-php-autoload-mode)
-(add-hook 'php-mode-hook #'company-phpactor)
-(add-hook 'php-mode-hook #'company-files)
+;; END PHP
 
 ;; Rust
 (add-hook 'rust-mode-hook
