@@ -109,7 +109,7 @@
  '(mini-frame-show-parameters '((top . 0) (width . 0.8) (left . 0.5) (height . 15)))
  '(objed-cursor-color "#ff5370")
  '(package-selected-packages
-   '(eldoc-overlay treemacs-all-the-icons ace-jump-mode undo-fu undo-tree xhair beacon rainbow-mode intellij-theme hy-mode almost-mono-themes molokai-theme csharp-mode spacemacs-theme go-mode dotnet danneskjold-theme csproj-mode lsp-ui lsp-mode yasnippet lsp-treemacs helm-lsp projectile hydra flycheck company avy which-key helm-xref dap-mode phpactor magit git-gutter highlight-parentheses yaml-mode smart-comment fic-mode emmet-mode vue-mode god-mode dimmer paredit clojure-mode clojure-mode-extra-font-locking cider smex hl-line slime common-lisp-snippets autothemer hl-todo))
+   '(lsp-java eldoc-overlay treemacs-all-the-icons ace-jump-mode undo-fu undo-tree xhair beacon rainbow-mode intellij-theme hy-mode almost-mono-themes molokai-theme csharp-mode spacemacs-theme go-mode dotnet danneskjold-theme csproj-mode lsp-ui lsp-mode yasnippet lsp-treemacs helm-lsp projectile hydra flycheck company avy which-key helm-xref dap-mode phpactor magit git-gutter highlight-parentheses yaml-mode smart-comment fic-mode emmet-mode vue-mode god-mode dimmer paredit clojure-mode clojure-mode-extra-font-locking cider smex hl-line slime common-lisp-snippets autothemer hl-todo))
  '(pdf-view-midnight-colors (cons "#EEFFFF" "#263238"))
  '(rustic-ansi-faces
    ["#263238" "#ff5370" "#c3e88d" "#ffcb6b" "#82aaff" "#c792ea" "#89DDFF" "#EEFFFF"])
@@ -157,8 +157,6 @@
 (setq god-exempt-major-modes nil)
 (setq god-exempt-predicates nil)
 (setq indent-tabs-mode nil)
-;; (setq mode-line-format nil)
-;; (setq-default mode-line-format nil)
 (setq window-divider-default-places t)
 (setq window-divider-default-bottom-width 3)
 (setq window-divider-default-right-width 3)
@@ -187,6 +185,7 @@
 (dimmer-mode t)
 (window-divider-mode)
 (beacon-mode t)
+(delete-selection-mode)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; SMOOTH SCROLLING
 (setq mouse-wheel-scroll-amount '(2 ((shift) . 2))) ;; one line at a time
@@ -339,9 +338,29 @@ Move the cursor to the new line."
             (rainbow-mode t)
             (prettify-symbols-mode)))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+;; JAVA
+(add-hook 'java-mode-hook #'lsp)
+(add-hook 'java-mode-hook #'fic-mode)
+(add-hook 'java-mode-hook 'git-gutter-mode)
+(add-hook 'java-mode-hook (lambda ()
+   ;;(ede-php-autoload-mode)
+   (company-mode t)
+   (electric-pair-mode t)
+   (setq lsp-enable-symbol-highlighting t)
+   (setq lsp-ui-doc-enable t)
+   (setq lsp-lens-enable t)
+   (setq lsp-headerline-breadcrumb-enable t)
+   (setq lsp-ui-sideline-enable t)
+   (setq lsp-ui-sideline-enable t)
+   (setq lsp-modeline-code-actions-enable t)
+   (setq lsp-eldoc-enable-hover t)
+   (setq lsp-completion-provider `lsp-completion-provider)
+   (setq lsp-completion-enable t)
+   (setq lsp-completion-show-detail t)
+   (setq lsp-completion-show-kind t)
+   (setq lsp-java-vmargs `("-noverify"
+                           "-Xmx1G"
+                           "-XX:+UseG1GC"
+                           "-XX:+UseStringDeduplication"
+                           ,(concat "-javaagent:" (getenv "HOME") "/.m2/repository/org/projectlombok/lombok/1.18.24/lombok-1.18.24.jar")
+                           ,(concat "-Xbootclasspath/a:" (getenv "HOME") "/.m2/repository/org/projectlombok/lombok/1.18.24/lombok-1.18.24.jar")))))
