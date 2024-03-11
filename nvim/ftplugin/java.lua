@@ -51,7 +51,7 @@ local config = {
     java = {
       format = {
         settings = {
-          url = home .. "/Progs/jdtls/eclipse/eclipse-java-google-style.xml",
+          url = home .. "/Progs/jdtls/eclipse-java-google-style.xml",
           profile = "GoogleStyle",
         },
       },
@@ -91,27 +91,19 @@ local config = {
       },
       -- См.: https://github.com/eclipse/eclipse.jdt.ls/wiki/Running-the-JAVA-LS-server-from-the-command-line#initialize-request
 	    -- ВАЖНО: Поле `name` НЕ выбирается произвольно, но должно соответствовать одному из элементов в `enum ExecutionEnvironment` по ссылке выше.
-      -- configuration = {
-      --   runtimes = {
-      --     {
-      --       name = "JavaSE-17",
-      --       path = home .. "/.asdf/installs/java/corretto-17.0.4.9.1", -- прим. перевод.: JDK, которые использует автор. У вас могут быть свои :)
-      --     },
-      --     {
-      --       name = "JavaSE-11",
-      --       path = home .. "/.asdf/installs/java/corretto-11.0.16.9.1",
-      --     },
-      --     {
-      --       name = "JavaSE-1.8",
-      --       path = home .. "/.asdf/installs/java/corretto-8.352.08.1"
-      --     },
-      --   }
-      -- }
+      configuration = {
+        runtimes = {
+          {
+            name = "JavaSE-21",
+            path = "/lib/jvm/java-21-openjdk", -- прим. перевод.: JDK, которые использует автор. У вас могут быть свои :)
+          },
+        }
+      }
     }
   },
   -- См.: https://github.com/eclipse/eclipse.jdt.ls#running-from-the-command-line
   cmd = {
-    "/data/data/com.termux/files/usr/bin/java",
+    "/usr/bin/java",
     '-Declipse.application=org.eclipse.jdt.ls.core.id1',
     '-Dosgi.bundles.defaultStartLevel=4',
     '-Declipse.product=org.eclipse.jdt.ls.core.product',

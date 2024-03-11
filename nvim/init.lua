@@ -30,6 +30,12 @@ vim.cmd [[ syntax enable ]]
 vim.cmd [[ set noshowmode ]]
 vim.opt.laststatus = 0
 vim.opt.fillchars:append { eob = " " }
+vim.opt.cursorline = true
+
+-- vim.cmd [[
+-- set list
+-- set listchars=tab:»-,extends:»,precedes:«,space:·
+-- ]]
 
 vim.keymap.set("n", "<SPACE>", "<Nop>")
 vim.g.mapleader = " "
@@ -45,6 +51,7 @@ require("lazy").setup({
       lspconfig.gopls.setup({})
       -- lspconfig.jdtls.setup({})
       lspconfig.tsserver.setup({})
+      lspconfig.kotlin_language_server.setup({})
       vim.api.nvim_command [[ hi def link LspReferenceText CursorLine ]]
       vim.api.nvim_command [[ hi def link LspReferenceWrite CursorLine ]]
       vim.api.nvim_command [[ hi def link LspReferenceRead CursorLine ]]
@@ -53,6 +60,7 @@ require("lazy").setup({
       {"<leader>ls", "<cmd>:lua vim.lsp.buf.signature_help()<cr>", "LspSignatureHelp"},
       {"<leader>la", "<cmd>:lua vim.lsp.buf.code_action()<cr>", "LspCodeAction"},
       {"<leader>lr", "<cmd>:lua vim.lsp.buf.rename()<cr>", "LspRename"},
+      {"<leader>lrr", "<cmd>:lua vim.lsp.buf.hover()<cr>", "LspReferenceRead"},
       {"<leader>lf", "<cmd>:lua vim.lsp.buf.format()<cr>", "LspFormat"},
     }
   },
@@ -83,15 +91,15 @@ require("lazy").setup({
       local cmp = require("cmp")
       cmp.setup({
 	sources = cmp.config.sources(
-	  { { name = "nvim_lsp" } },
-	  { {name = "buffer"} }
-	),
-	snippet = {
-	  expand = function(args)
+    { { name = "nvim_lsp" } },
+    { {name = "buffer"} }
+  ),
+  snippet = {
+    expand = function(args)
             vim.fn["vsnip#anonymous"](args.body)
           end,
-	},
-	mapping = cmp.mapping.preset.insert({
+  },
+  mapping = cmp.mapping.preset.insert({
           ['<C-b>'] = cmp.mapping.scroll_docs(-4),
           ['<C-f>'] = cmp.mapping.scroll_docs(4),
           ['<C-Space>'] = cmp.mapping.complete(),
@@ -110,22 +118,18 @@ require("lazy").setup({
     "nvim-telescope/telescope.nvim",
     dependencies = { "nvim-lua/plenary.nvim" },
     keys = {
-
-      -- Files
+-------- Files
       { "<leader>ff", "<cmd>:Telescope find_files<cr>", desc="FindFiles" },
       { "<leader>fg", "<cmd>:Telescope live_grep<cr>", desc="Grep" },
-
-      -- Buffers
+-------- Buffers
       { "<leader>bb", "<cmd>:Telescope buffers<cr>", desc="Buffers" },
-
-      -- LSP
+-------- LSP
       { "<leader>lrf", "<cmd>:Telescope lsp_references<cr>", desc="LspReferences" },
       { "<leader>ld", "<cmd>:Telescope lsp_diagnostics<cr>", desc="LspDiagnostics" },
       { "<leader>li", "<cmd>:Telescope lsp_implementations<cr>", desc="LspImplementations" },
       { "<leader>ldd", "<cmd>:Telescope lsp_definitions<cr>", desc="LspDefinitions" },
       { "<leader>ltd", "<cmd>:Telescope lsp_type_definitions<cr>", desc="LspTypeDefinitions" },
-
-      -- Git
+-------- Git
       { "<leader>gc", "<cmd>:Telescope git_commits<cr>", desc="GitCommits" },
       { "<leader>gbc", "<cmd>:Telescope git_bcommits<cr>", desc="GitBufferCommits" },
       { "<leader>gb", "<cmd>:Telescope git_brances<cr>", desc="GitBranches" },
@@ -138,8 +142,8 @@ require("lazy").setup({
     dependencies = { "nvim-tree/nvim-web-devicons" },
     config = function()
       require("nvim-tree").setup({
-        view = {width = 30},
-	filters = {dotfiles = true},
+        view = {width = 50},
+        filters = {dotfiles = true},
       })
     end,
     keys = {
@@ -188,24 +192,30 @@ require("lazy").setup({
     end
   },
   {
-    "Mofiqul/vscode.nvim",
+    "cormacrelf/vim-colors-github",
     lazy = false,
+    priority = 100,
     config = function()
-      local vs = require("vscode")
-      vs.setup({
-        italic_comments = true,
-        style = "light",
-      })
-      vs.load()
-      -- vim.o.background = "light"
-      -- vim.cmd.colorscheme("intellij")
+      vim.o.background = "light"
+      vim.cmd.colorscheme("github")
+      -- vim.cmd([[ hi Normal guibg=white ctermbg=white]])
+      -- vim.cmd([[ highlight CursorLine guibg=#FAFAFA ]])
       -- vim.cmd([[ hi Normal guibg=NONE ctermbg=NONE ]])
       -- vim.cmd([[ hi SignColumn guibg=NONE ctermbg=NONE ]])
       -- vim.cmd([[ hi LineNr guibg=NONE ctermbg=NONE ]])
       -- vim.cmd([[ hi EndOfBuffer guibg=NONE ctermbg=NONE ]])
     end,
   },
-  "nvim-treesitter/nvim-treesitter",
+  {
+    "nvim-treesitter/nvim-treesitter",
+    config = function()
+      require('nvim-treesitter.configs').setup {
+        ensure_installed = { "java", "lua", "go", "sql" },
+        sync_install = false,
+        auto_install = true,
+      }
+    end
+  },
   {
     "terrortylor/nvim-comment",
     config = function()
@@ -221,5 +231,29 @@ require("lazy").setup({
     -- keys = {
     --   {"<leader>j", "<cmd>:<cr>"},
     -- },
+  },
+  {
+    "goolord/alpha-nvim",
+    dependencies = { "nvim-tree/nvim-web-devicons" },
+    config = function ()
+        require'alpha'.setup(require'alpha.themes.dashboard'.config)
+    end
+  },
+  {
+    "pappasam/nvim-repl",
+    init = function()
+      vim.g["repl_filetype_commands"] = {
+        javascript = "node",
+        python = "ipython --no-autoindent",
+        java = "mvsh",
+      }
+      vim.g.repl_split = "right"
+    end,
+    keys = {
+      { "<leader>rt", "<cmd>ReplToggle<cr>", desc = "Toggle nvim-repl" },
+      { "<leader>rc", "<cmd>ReplRunCell<cr>", desc = "nvim-repl run CELL" },
+      { "<leader>rl", "<Plug>ReplSendLine<cr>", desc = "nvim-repl run LINE" },
+      { "<leader>rv", "<Plug>ReplSendVisual<cr>", desc = "nvim-repl run VISUAL" , mode = "v"},
+    },
   }
 })
