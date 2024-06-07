@@ -52,6 +52,8 @@ require("lazy").setup({
       -- lspconfig.jdtls.setup({})
       lspconfig.tsserver.setup({})
       lspconfig.kotlin_language_server.setup({})
+      lspconfig.phpactor.setup({})
+      lspconfig.hls.setup{}
       vim.api.nvim_command [[ hi def link LspReferenceText CursorLine ]]
       vim.api.nvim_command [[ hi def link LspReferenceWrite CursorLine ]]
       vim.api.nvim_command [[ hi def link LspReferenceRead CursorLine ]]
@@ -192,12 +194,12 @@ require("lazy").setup({
     end
   },
   {
-    "cormacrelf/vim-colors-github",
+    "Mofiqul/vscode.nvim",
     lazy = false,
     priority = 100,
     config = function()
       vim.o.background = "light"
-      vim.cmd.colorscheme("github")
+      vim.cmd.colorscheme("vscode")
       -- vim.cmd([[ hi Normal guibg=white ctermbg=white]])
       -- vim.cmd([[ highlight CursorLine guibg=#FAFAFA ]])
       -- vim.cmd([[ hi Normal guibg=NONE ctermbg=NONE ]])
@@ -210,7 +212,7 @@ require("lazy").setup({
     "nvim-treesitter/nvim-treesitter",
     config = function()
       require('nvim-treesitter.configs').setup {
-        ensure_installed = { "java", "lua", "go", "sql" },
+        ensure_installed = { "java", "lua", "go", "sql", "php" },
         sync_install = false,
         auto_install = true,
       }
@@ -255,5 +257,28 @@ require("lazy").setup({
       { "<leader>rl", "<Plug>ReplSendLine<cr>", desc = "nvim-repl run LINE" },
       { "<leader>rv", "<Plug>ReplSendVisual<cr>", desc = "nvim-repl run VISUAL" , mode = "v"},
     },
-  }
+  },
+  {
+    "folke/which-key.nvim",
+    event = "VeryLazy",
+    init = function()
+      vim.o.timeout = true
+      vim.o.timeoutlen = 300
+    end,
+    opts = {
+      -- your configuration comes here
+      -- or leave it empty to use the default settings
+      -- refer to the configuration section below
+    }
+  },
+  {
+    "kylechui/nvim-surround",
+    version = "*", -- Use for stability; omit to use `main` branch for the latest features
+    event = "VeryLazy",
+    config = function()
+        require("nvim-surround").setup({
+            -- Configuration here, or leave empty to use defaults
+        })
+    end
+  },
 })
