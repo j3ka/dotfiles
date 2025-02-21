@@ -162,7 +162,7 @@
 
 (use-package expand-region
   :ensure t
-  :bind (("C-=" . ar/expand-region)))
+  :bind (("C-=" . er/expand-region)))
 
 (use-package clojure-mode
   :ensure t
