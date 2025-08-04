@@ -2,12 +2,15 @@
 add-highlighter global/ number-lines -hlcursor -relative -separator "  "
 add-highlighter global/ show-matching
 
+
 # Options
 set-option global tabstop 2
 set-option global indentwidth 2
 set-option global scrolloff 8,3
 set-option -add global ui_options terminal_assistant=none # goodbye, clippy
 set-option global grepcmd 'rg -Hn --no-heading' # use ripgrep
+# set-option global modelinefmt ' [%val{mode}] %val{bufname} %opt{filetype} %opt{readonly}'
+set-option global modelinefmt ' %val{bufname} {{context_info}} {{mode_info}} - %val{client}@[%val{session}]'
 
 ## Keybindings
 # Readline navigation
@@ -56,7 +59,6 @@ hook global InsertCompletionShow .* %{
   }
 }
 
-
 # functions for readline
 define-command -hidden readline-forward-word %{
     try %{
@@ -80,9 +82,38 @@ define-command rg-files %{
 # Change dark/light colorscheme accourding to desktop dark/light theme
 define-command colo %sh{
   if [ "$(gsettings get org.gnome.desktop.interface color-scheme)" = "'prefer-dark'" ]; then
-  	echo "colorscheme tomorrow-night"
+  	echo "colorscheme base16"
+  	echo "set-face global MenuForeground 'default,rgb:081e35'"
+  	echo "set-face global MenuBackground 'rgb:CECECE,default'"
+  	echo "set-face global Information 'rgb:CECECE,default'"
+  	echo "set-face global module 'default'"
+		echo "set-face global PrimarySelection 'default,rgb:081e35'"
   else
-  	echo "colorscheme github"
+  	echo "colorscheme default"
+  	echo "set-face global type 'default'"
+  	echo "set-face global MenuForeground 'default,rgb:cce5ff'"
+  	echo "set-face global MenuBackground 'rgb:555555,rgb:dedede'"
+  	echo "set-face global Information 'rgb:555555,rgb:dedede'"
+		echo "set-face global PrimarySelection 'default,rgb:cce5ff'"
   fi
 }
 colo
+
+# Enable auto-pairs
+enable-auto-pairs
+
+# Reple
+define-command reple-eval %{
+	evaluate-commands %sh{echo "$kak_selection" | reple eval}
+}
+# define-command reple-eval-py %{
+# 	evaluate-commands %sh{echo "$kak_selection" | pypaste | reple eval} # using pypaste for py
+# }
+
+map global user e ":reple-eval<ret>" -docstring "Eval in reple"
+
+# hook global BufCreate .*\.py %{
+# 	unmap global normal <A-ret>
+# 	map global normal <A-ret> ":reple-eval-py<ret>"
+# }
+
