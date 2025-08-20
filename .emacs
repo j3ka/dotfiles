@@ -1,0 +1,277 @@
+(require 'package)
+
+;; (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
+(add-to-list 'load-path (concat user-emacs-directory "local/"))
+
+(package-initialize)
+
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents) ;; update package list (very slow)
+  (package-install 'use-package))
+
+(eval-and-compile
+  (setq use-package-always-ensure t
+        use-package-expand-minimally t))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Base packages
+
+(use-package undo-fu
+  :ensure t
+  :bind (("C-_" . undo-fu-only-undo)
+         ("C-+" . undo-fu-only-redo)))
+
+(use-package which-key
+  :ensure t
+  :config
+  (which-key-mode))
+
+(use-package avy
+  :ensure t
+  :bind ("C-;" . avy-goto-char-timer))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Project packages
+
+(use-package all-the-icons
+  :if (display-graphic-p)
+  :ensure t)
+
+(use-package treemacs-all-the-icons
+  :if (display-graphic-p)
+  :after all-the-icons
+  :ensure t)
+
+(use-package treemacs
+  :ensure t
+  :defer t
+  :config (when (display-graphic-p)
+             (treemacs-load-theme "all-the-icons"))
+  :bind ("M-1" . treemacs)
+  :config
+  (add-hook 'treemacs-mode-hook (lambda() (display-line-numbers-mode -1))))
+
+(use-package projectile
+  :ensure t)
+
+(use-package projectile-ripgrep
+  :ensure t
+  :after ripgrep)
+
+(use-package flycheck-projectile
+  :ensure t
+  :after flycheck)
+
+(use-package lsp-treemacs
+  :ensure t
+  :after (lsp-mode treemacs))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Code-related packages
+(use-package flycheck
+  :ensure t
+  :config (global-flycheck-mode))
+
+(use-package lsp-mode
+  :ensure t
+  :hook (python-mode)
+  :config
+  (setq ring-bell-function 'ignore))
+
+(use-package lsp-ui
+  :ensure t
+  :after (lsp-mode))
+
+(use-package ripgrep
+  :ensure t)
+
+(use-package company
+  :ensure t
+  :config
+  (setq company-minimum-prefix-length 1 company-idle-delay 0.0)
+  (global-company-mode t))
+
+;; (use-package ligature
+;;   :ensure t
+;;   :if (display-graphic-p)
+;;   :config
+;;   (ligature-set-ligatures
+;;    'prog-mode
+;;    '("-|" "-~" "---" "-<<" "-<" "--" "->" "->>" "-->" "///" "/=" "/=="
+;;      "/>" "//" "/*" "*>" "***" "*/" "<-" "<<-" "<=>" "<=" "<|" "<||"
+;;      "<|||" "<|>" "<:" "<>" "<-<" "<<<" "<==" "<<=" "<=<" "<==>" "<-|"
+;;      "<<" "<~>" "<=|" "<~~" "<~" "<$>" "<$" "<+>" "<+" "</>" "</" "<*"
+;;      "<*>" "<->" "<!--" ":>" ":<" ":::" "::" ":?" ":?>" ":=" "::=" "=>>"
+;;      "==>" "=/=" "=!=" "=>" "===" "=:=" "==" "!==" "!!" "!=" ">]" ">:"
+;;      ">>-" ">>=" ">=>" ">>>" ">-" ">=" "&&&" "&&" "|||>" "||>" "|>" "|]"
+;;      "|}" "|=>" "|->" "|=" "||-" "|-" "||=" "||" ".." ".?" ".=" ".-" "..<"
+;;      "..." "+++" "+>" "++" "[||]" "[<" "[|" "{|" "??" "?." "?=" "?:" "##"
+;;      "###" "####" "#[" "#{" "#=" "#!" "#:" "#_(" "#_" "#?" "#(" ";;" "_|_"
+;;      "__" "~~" "~~>" "~>" "~-" "~@" "$>" "^=" "]#"))
+;;   (global-ligature-mode t))
+
+(use-package string-inflection
+  :ensure t
+  :bind ("C-c C-u" . string-inflection-all-cycle))
+
+(use-package dap-mode
+  :defer t
+  :ensure t)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Git packages
+
+(use-package magit
+  :defer t
+  :ensure t)
+
+(use-package git-gutter
+  :ensure t
+  :hook (prog-mode-hook))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Clojure
+
+(use-package paredit
+  :ensure t)
+
+;; (use-package smartparens
+;;   :ensure t
+;;   :hook (prog-mode text-mode)
+;;   :config
+;;   (require 'smartparens-config))
+
+(use-package expand-region
+  :ensure t
+  :bind (("C-=" . er/expand-region)))
+
+;; (use-package clojure-mode
+;;   :ensure t
+;;   :defer t
+;;   :after (lsp-mode paredit) ;;eldoc-overlay
+;;   :bind (("RET" . electrify-return-if-match))
+;;   :config
+;;   (add-hook
+;;    'clojure-mode-hook
+;;    (lambda ()
+;;      (lsp)
+;;      (paredit-mode)
+;;      (turn-on-eldoc-mode)
+;;      ;;(eldoc-overlay-mode)
+;;      (eldoc-add-command
+;;       'paredit-backward-delete
+;;       'paredic-close-round)
+;;      (show-paren-mode)
+;;      (clj-refactor-mode 1)
+;;      (prettify-symbols-mode))))
+
+;; (use-package cider
+;;   :defer t
+;;   :ensure t
+;;   :config
+;;   (setq cider-switch-to-repl-on-insert nil
+;;         cider-invert-insert-eval-p t))
+
+(use-package verb
+  :ensure t
+  :defer t)
+
+(use-package org
+  :mode ("\\.org\\'" . org-mode)
+  :config (define-key org-mode-map (kbd "C-c C-r") verb-command-map))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Default params
+
+;; (when (display-graphic-p)
+;;   (setq-default cursor-type '(bar . 3)))
+
+(setq whitespace-display-mappings '((tab-mark 9 [124 9] [92 9])))
+(setq whitespace-style '(face tabs tab-mark trailing))
+(setq-default electric-indent-inhibit t)
+(setq make-backup-files nil) ;; stop creating ~ files
+(setq create-lockfiles nil) ;; stop creating # files
+(setq-default indent-tabs-mode nil)
+(setq display-line-numbers "%4d \u2502 ") ;; make line numbers compatibel with gitgutter
+(setq inhibit-startup-message t)   ;; No startup page'
+(setq initial-scratch-message nil) ;; No *scratch* buffer message
+(setq indent-tabs-mode nil)
+(setq window-divider-default-places t)
+(setq window-divider-default-bottom-width 3)
+(setq window-divider-default-right-width 3)
+(setq ring-bell-function 'ignore) ;; disable beeep-sound on input in LSP-mode
+;;(set-frame-parameter nil 'fullscreen 'fullboth) ;; fullscreen by default
+
+(global-whitespace-mode)
+(menu-bar-mode 0)                  ;; No menubar
+(tool-bar-mode 0)                  ;; No toolbar
+(tooltip-mode  0)                  ;; No tooltip
+(scroll-bar-mode 0)                ;; Noe scrollbar
+
+(add-to-list 'default-frame-alist '(font . "VictorMono"))
+(set-face-attribute 'default t :font "VictorMono" :height 280)
+(set-face-attribute 'default nil :height 120)
+
+(load "ligature") ;; Ligatures
+(ligature-set-ligatures
+ 'prog-mode
+ '("-|" "-~" "---" "-<<" "-<" "--" "->" "->>" "-->" "///" "/=" "/=="
+   "/>" "//" "/*" "*>" "***" "*/" "<-" "<<-" "<=>" "<=" "<|" "<||"
+   "<|||" "<|>" "<:" "<>" "<-<" "<<<" "<==" "<<=" "<=<" "<==>" "<-|"
+   "<<" "<~>" "<=|" "<~~" "<~" "<$>" "<$" "<+>" "<+" "</>" "</" "<*"
+   "<*>" "<->" "<!--" ":>" ":<" ":::" "::" ":?" ":?>" ":=" "::=" "=>>"
+   "==>" "=/=" "=!=" "=>" "===" "=:=" "==" "!==" "!!" "!=" ">]" ">:"
+   ">>-" ">>=" ">=>" ">>>" ">-" ">=" "&&&" "&&" "|||>" "||>" "|>" "|]"
+   "|}" "|=>" "|->" "|=" "||-" "|-" "||=" "||" ".." ".?" ".=" ".-" "..<"
+   "..." "+++" "+>" "++" "[||]" "[<" "[|" "{|" "??" "?." "?=" "?:" "##"
+   "###" "####" "#[" "#{" "#=" "#!" "#:" "#_(" "#_" "#?" "#(" ";;" "_|_"
+   "__" "~~" "~~>" "~>" "~-" "~@" "$>" "^=" "]#"))
+(global-ligature-mode t)
+
+(window-divider-mode)
+(delete-selection-mode)
+;; (global-hl-line-mode t)
+(electric-pair-mode t)
+;; (global-display-line-numbers-mode t)
+
+(add-hook
+ 'emacs-lisp-mode-hook
+ '(lambda ()
+    (paredit-mode)
+    (prettify-symbols-mode)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Custom functions
+
+(defvar electrify-return-match "[\]}\)\"]")
+
+(defun electrify-return-if-match (arg)
+  "If the text after the cursor matches `electrify-return-match'
+then open and indent an empty line between the cursor and the text.
+Move the cursor to the new line."
+  (interactive "P")
+  (let ((case-fold-search nil))
+    (if (looking-at electrify-return-match)
+        (save-excursion (newline-and-indent)))
+    (newline arg)
+    (indent-according-to-mode)))
+
+(defun smart-beginning-of-line ()
+ "Smart Home."
+  (interactive "^")
+  (let ((oldpos (point)))
+    (back-to-indentation)
+    (and (= oldpos (point))
+         (beginning-of-line))))
+(global-set-key (kbd "C-a") 'smart-beginning-of-line)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Custom keybindings
+(global-set-key (kbd "<f2>") 'buffer-menu)
+
+
+(defun string-trim-final-newline (string)
+  (let ((len (length string)))
+    (cond
+     ((and (> len 0) (eql (aref string (- len 1)) ?\n))
+      (substring string 0 (- len 1)))
+     (t string))))
+
+(let
+    ((dark-or-light (string-trim-final-newline
+                     (shell-command-to-string "gsettings get org.gnome.desktop.interface color-scheme"))))
+  (if (string-equal dark-or-light "'prefer-dark'")
+    (load-theme 'modus-vivendi)
+    (load-theme 'modus-operandi)))
