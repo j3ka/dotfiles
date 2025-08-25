@@ -174,7 +174,19 @@
 
 (use-package org
   :mode ("\\.org\\'" . org-mode)
-  :config (define-key org-mode-map (kbd "C-c C-r") verb-command-map))
+  :config
+  (define-key org-mode-map (kbd "C-c C-r") verb-command-map)
+  (setq org-html-validation-link nil)
+  (setq org-publish-project-alist
+        '(("knowladge-crypto"
+         :base-directory "~/Knowladge/crypto"
+         :publishing-function org-html-publish-to-html
+         :publishing-directory "~/Knowladge/crypto/target"
+         :auto-sitemap t
+         :sitemap-filename "index.org"
+         ;; :section-numbers nil
+         ;; :with-toc nil
+         ))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Default params
 
@@ -196,6 +208,7 @@
 (setq window-divider-default-right-width 3)
 (setq ring-bell-function 'ignore) ;; disable beeep-sound on input in LSP-mode
 ;;(set-frame-parameter nil 'fullscreen 'fullboth) ;; fullscreen by default
+(setq doc-view-continuous t)
 
 (global-whitespace-mode)
 (menu-bar-mode 0)                  ;; No menubar
@@ -275,3 +288,15 @@ Move the cursor to the new line."
   (if (string-equal dark-or-light "'prefer-dark'")
     (load-theme 'modus-vivendi)
     (load-theme 'modus-operandi)))
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages nil))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
